@@ -1,0 +1,76 @@
+{{# def.definitions }}
+
+{{## def._warning:_rule:
+  {{ 'istanbul ignore else'; }}
+  {{? it.createWarnings !== false }}
+    {
+      keyword: '{{= $errorKeyword || _rule }}'
+      , dataPath: (dataPath || '') + {{= it.errorPath }}
+      , schemaPath: {{=it.util.toQuotedString($errSchemaPath)}}
+      , params: {{# def._warningParams[_rule] }}
+      {{? it.opts.messages !== false }}
+        , message: {{# def._warningMessages[_rule] }}
+      {{?}}
+      {{? it.opts.verbose }}
+        , schema: {{# def._warningSchemas[_rule] }}
+        , parentSchema: validate.schema{{=it.schemaPath}}
+        , data: {{=$data}}
+      {{?}}
+    }
+  {{??}}
+    {}
+  {{?}}
+#}}
+
+
+{{## def._addWarning:_rule:
+  if (vWarnings === null) vWarnings = [warning];
+  else vWarnings.push(warning);
+  warnings++;
+#}}
+
+
+{{## def.addWarning:_rule:
+  var warning = {{# def._warning:_rule }};
+  {{# def._addWarning:_rule }}
+#}}
+
+
+{{## def.warning:_rule:
+  {{# def.beginDefOut}}
+    {{# def._warning:_rule }}
+  {{# def.storeDefOut:__warning }}
+
+  var warning = {{=__warning}};
+  {{# def._addWarning:_rule }}
+#}}
+
+
+{{## def.checkWarning:_rule:
+  if (!{{=$valid}}) {
+    {{# def.warning:_rule }}
+  }
+#}}
+
+{{## def.resetWarnings:
+  warnings = {{=$warnings}};
+  if (vWarnings !== null) {
+    if ({{=$warnings}}) vWarnings.length = {{=$warnings}};
+    else vWarnings = null;
+  }
+#}}
+
+
+{{## def._warningMessages = {
+  additionalProperties: "'unknown additional property found'"
+} #}}
+
+
+{{## def._warningSchemas = {
+  additionalProperties: "false"
+} #}}
+
+
+{{## def._warningParams = {
+  additionalProperties: "{ additionalProperty: '{{=$additionalProperty}}' }"
+} #}}

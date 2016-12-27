@@ -37,3 +37,6 @@ lib/dotjs/*.js
 
 # bundles
 dist/
+
+# Webstorm files
+.idea/

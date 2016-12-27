@@ -6,6 +6,7 @@ var Ajv = require('./ajv')
 
 
 describe('Ajv Options', function () {
+
   describe('removeAdditional', function() {
     it('should remove all additional properties', function() {
       var ajv = new Ajv({ removeAdditional: 'all' });
@@ -23,6 +24,81 @@ describe('Ajv Options', function () {
       object.should.have.property('foo');
       object.should.have.property('bar');
       object.should.not.have.property('baz');
+    });
+
+    it('should not remove any additional property nor add warnings', function() {
+        //TODO: Fix it. This is in fact a problem with removeAdditional
+        //that's selecting the first schema in oneOf see https://github.com/epoberezkin/ajv#filtering-data
+        var ajv = new Ajv({ warnings: true, removeAdditional: "failing" });
+
+        var object = {
+            foo: 'foo', bar: 'bar', baz: 'baz-to-be-kept', fizz: 1000
+        };
+
+        var validate = ajv.compile({
+            id: '//test/fooBar',
+            oneOf: [{
+                properties: {
+                    foo: {type: 'string'},
+                    bar: {type: 'string'}},
+                additionalProperties: false
+            },
+                {
+                    properties: {
+                        foo: {type: 'string'},
+                        bar: {type: 'string'},
+                        baz: {type: 'string'},
+                        fizz: {type: 'number'}
+                    },
+                    additionalProperties: false
+                }
+            ]
+        });
+
+        validate(object).should.equal(true);
+        object.should.have.property('foo');
+        object.should.have.property('bar');
+        object.should.have.property('baz');
+        object.should.have.property('fizz');
+
+        console.log(JSON.stringify(validate.warnings[0]));
+        should.equal(validate.errors, null);
+        should.equal(validate.warnings, null);
+
+    });
+
+    it('should remove all additional properties and add warnings for unknown additional properties', function() {
+        var ajv = new Ajv({ warnings: true, removeAdditional: "failing" });
+
+        var object = {
+            foo: 'foo', bar: 'bar', baz: 'baz-to-be-kept', fizz: 1000
+        };
+
+        var validate = ajv.compile({
+            id: '//test/fooBar',
+            properties: { foo: { type: 'string' }, bar: { type: 'string' } },
+            additionalProperties: false
+        });
+
+        validate(object).should.equal(true);
+        object.should.have.property('foo');
+        object.should.have.property('bar');
+        object.should.not.have.property('baz');
+        object.should.not.have.property('fizz');
+
+
+        validate.warnings.should.have.length(2);
+
+        should.equal(validate.warnings[0].keyword, "additionalProperties");
+        should.equal(validate.warnings[0].schemaPath, "#/properties");
+        validate.warnings[0].params.should.eql({"additionalProperty":"baz"});
+        should.equal(validate.warnings[0].message, "unknown additional property found");
+
+        should.equal(validate.warnings[1].keyword, "additionalProperties");
+        should.equal(validate.warnings[1].schemaPath, "#/properties");
+        validate.warnings[1].params.should.eql({"additionalProperty":"fizz"});
+        should.equal(validate.warnings[1].message, "unknown additional property found");
+
     });
 
 

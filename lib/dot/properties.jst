@@ -1,5 +1,6 @@
 {{# def.definitions }}
 {{# def.errors }}
+{{# def.warnings }}
 {{# def.setupKeyword }}
 {{# def.setupNextLevel }}
 
@@ -20,7 +21,6 @@
   {{# def.optimizeValidate }}
 #}}
 
-
 {{
   var $key = 'key' + $lvl
     , $dataNxt = $it.dataLevel = it.dataLevel + 1
@@ -35,6 +35,7 @@
     , $additionalIsSchema = typeof $aProperties == 'object'
                               && Object.keys($aProperties).length
     , $removeAdditional = it.opts.removeAdditional
+    , $warnings = it.opts.warnings
     , $checkAdditional = $noAdditional || $additionalIsSchema || $removeAdditional
     , $ownProperties = it.opts.ownProperties
     , $currentBaseId = it.baseId;
@@ -51,6 +52,9 @@
 
 
 var {{=$errs}} = errors;
+{{? $warnings }}
+var {{=$warns}} = warnings;
+{{?}}
 var valid{{=$it.level}} = true;
 
 {{? $checkAdditional }}
@@ -81,12 +85,17 @@ var valid{{=$it.level}} = true;
 
       if (isAdditional{{=$lvl}}) {
     {{?}}
+    {{
+        var $additionalProperty = '\' + key' + $lvl + ' + \'';
+    }}
+    {{? $it.opts.warnings }}
+        {{# def.warning:'additionalProperties' }}
+    {{?}}
     {{? $removeAdditional == 'all' }}
       delete {{=$data}}[{{=$key}}];
     {{??}}
       {{
         var $currentErrorPath = it.errorPath;
-        var $additionalProperty = '\' + key' + $lvl + ' + \'';
         if (it.opts._errorDataPathProperty) {
           it.errorPath = it.util.getPathExpr(it.errorPath, 'key' + $lvl, it.opts.jsonPointers);
         }

@@ -958,6 +958,7 @@ Defaults:
   // validation and reporting options:
   v5:               false,
   allErrors:        false,
+  warnings:         false,
   verbose:          false,
   jsonPointers:     false,
   uniqueItems:      true,
@@ -998,6 +999,7 @@ Defaults:
 
 - _v5_: add keywords `switch`, `constant`, `contains`, `patternGroups`, `patternRequired`, `formatMaximum` / `formatMinimum` and `formatExclusiveMaximum` / `formatExclusiveMinimum` from [JSON-schema v5 proposals](https://github.com/json-schema/json-schema/wiki/v5-Proposals). With this option added schemas without `$schema` property are validated against [v5 meta-schema](https://raw.githubusercontent.com/epoberezkin/ajv/master/lib/refs/json-schema-v5.json#). `false` by default.
 - _allErrors_: check all rules collecting all errors. Default is to return after the first error.
+- _warnings_: collect warnings into validate.warnings.
 - _verbose_: include the reference to the part of the schema (`schema` and `parentSchema`) and validated data in errors (false by default).
 - _jsonPointers_: set `dataPath` propery of errors using [JSON Pointers](https://tools.ietf.org/html/rfc6901) instead of JavaScript property access notation.
 - _uniqueItems_: validate `uniqueItems` keyword (true by default).
