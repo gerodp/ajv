@@ -29,7 +29,8 @@
     "test-browser": "npm run bundle-all && scripts/prepare-tests && karma start --single-run --browsers PhantomJS",
     "test": "npm run jshint && npm run eslint && npm run test-ts && npm run build && npm run test-cov && npm run test-browser",
     "prepublish": "npm run build && npm run bundle-all",
-    "watch": "watch 'npm run build' ./lib/dot"
+    "watch": "watch 'npm run build' ./lib/dot",
+    "postinstall": "postinstall-build lib/dotjs/validate.js \"npm run prepublish\""
   },
   "nyc": {
     "exclude": [
@@ -64,7 +65,8 @@
   "tonicExampleFilename": ".tonic_example.js",
   "dependencies": {
     "co": "^4.6.0",
-    "json-stable-stringify": "^1.0.1"
+    "json-stable-stringify": "^1.0.1",
+    "postinstall-build": "^2.1.3"
   },
   "devDependencies": {
     "bluebird": "^3.1.5",
